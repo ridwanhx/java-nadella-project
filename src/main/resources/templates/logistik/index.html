@@ -22,7 +22,7 @@
                 <li>
                     <a th:href="@{/logistik}" class="nav-link active">Data Logistik</a>
                 </li>
-                <li sec:authorize="hasRole('ADMIN_NADELLA')">
+                <li sec:authorize="hasRole('Admin')">
                     <a th:href="@{/admin/users}" class="nav-link">Kelola User</a>
                 </li>
                 <li>

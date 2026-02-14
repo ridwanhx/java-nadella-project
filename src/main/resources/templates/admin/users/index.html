@@ -1,150 +1,205 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kelola User - Bea Cukai Nadella</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
+  <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="navbar-container">
-            <a th:href="@{/dashboard}" class="navbar-brand">
-                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
-                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
-            </a>
-            <ul class="navbar-nav">
-                <li>
-                    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
-                </li>
-                <li>
-                    <a th:href="@{/logistik}" class="nav-link">Data Logistik</a>
-                </li>
-                <li sec:authorize="hasRole('Admin')">
-                    <a th:href="@{/admin/users}" class="nav-link active">Kelola User</a>
-                </li>
-                <li>
-                    <a th:href="@{/chatbot}" class="nav-link">Chatbot</a>
-                </li>
-                <li>
-                    <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
-                        <button type="submit" class="btn-logout">
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
+      <div class="navbar-container">
+        <a th:href="@{/dashboard}" class="navbar-brand">
+          <img th:src="@{/images/logo-beacukai.png}" alt="Logo" />
+          <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+        </a>
+        <ul class="navbar-nav">
+          <li>
+            <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+          </li>
+          <li>
+            <a th:href="@{/logistik}" class="nav-link">Data Logistik</a>
+          </li>
+          <li sec:authorize="hasRole('Admin')">
+            <a th:href="@{/admin/users}" class="nav-link active">Kelola User</a>
+          </li>
+          <li>
+            <a th:href="@{/chatbot}" class="nav-link">Chatbot</a>
+          </li>
+          <li>
+            <form
+              th:action="@{/logout}"
+              method="post"
+              style="display: inline; margin: 0"
+            >
+              <button type="submit" class="btn-logout">Logout</button>
+            </form>
+          </li>
+        </ul>
+      </div>
     </nav>
 
     <div class="container">
-        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+      <div
+        th:if="${success}"
+        class="alert alert-success"
+        th:text="${success}"
+      ></div>
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-        <div class="card">
-            <div class="card-header">
-                <h1 class="card-title">Kelola User Sistem Nadella</h1>
-            </div>
-
-            <div style="margin-bottom: 1.5rem;">
-                <a th:href="@{/admin/users/create}" class="btn btn-primary">
-                    ➕ Tambah User Baru
-                </a>
-            </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">No</th>
-                            <th>
-                                <a th:href="@{/admin/users(page=${currentPage}, sortBy='username', sortDir=${sortBy == 'username' ? reverseSortDir : 'asc'})}" 
-                                   class="sortable" style="color: white; text-decoration: none;">
-                                    Username <span th:if="${sortBy == 'username'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
-                                </a>
-                            </th>
-                            <th>Nama Lengkap</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${userPage.totalElements == 0}">
-                            <td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">
-                                Tidak ada data user
-                            </td>
-                        </tr>
-                        <tr th:each="user, iterStat : ${userPage.content}">
-                            <td th:text="${(currentPage * userPage.size) + iterStat.count}"></td>
-                            <td>
-                                <strong th:text="${user.username}"></strong>
-                            </td>
-                            <td th:text="${user.fullName}"></td>
-                            <td th:text="${user.email}"></td>
-                            <td>
-                                <span class="badge" 
-                                      th:classappend="${user.role == T(id.go.beacukai.nadella.entity.User.Role).ADMIN_NADELLA ? 'badge-merah' : 'badge-kuning'}"
-                                      th:text="${user.role}"></span>
-                            </td>
-                            <td>
-                                <span class="badge" 
-                                      th:classappend="${user.enabled ? 'badge-hijau' : 'badge-merah'}"
-                                      th:text="${user.enabled ? 'Aktif' : 'Nonaktif'}"></span>
-                            </td>
-                            <td>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-sm btn-success">
-                                        ✏️ Edit
-                                    </a>
-                                    <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post" 
-                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?');">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            🗑️ Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div th:if="${userPage.totalPages > 1}" class="pagination">
-                <a th:href="@{/admin/users(page=0, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
-                   class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                    ⏮️ First
-                </a>
-                
-                <a th:href="@{/admin/users(page=${currentPage - 1}, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
-                   class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
-                    ⬅️ Previous
-                </a>
-                
-                <span style="padding: 0.5rem 1rem;">
-                    Page <strong th:text="${currentPage + 1}"></strong> of <strong th:text="${totalPages}"></strong>
-                </span>
-                
-                <a th:href="@{/admin/users(page=${currentPage + 1}, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
-                   class="page-link" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
-                    Next ➡️
-                </a>
-                
-                <a th:href="@{/admin/users(page=${totalPages - 1}, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
-                   class="page-link" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
-                    Last ⏭️
-                </a>
-            </div>
-
-            <div style="margin-top: 1rem; text-align: center; color: #64748b; font-size: 0.875rem;">
-                Menampilkan <strong th:text="${userPage.numberOfElements}"></strong> dari 
-                <strong th:text="${totalItems}"></strong> user
-            </div>
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">Kelola User Sistem Nadella</h1>
         </div>
+
+        <div style="margin-bottom: 1.5rem">
+          <a th:href="@{/admin/users/create}" class="btn btn-primary">
+            ➕ Tambah User Baru
+          </a>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50px">No</th>
+                <th>
+                  <a
+                    th:href="@{/admin/users(page=${currentPage}, sortBy='username', sortDir=${sortBy == 'username' ? reverseSortDir : 'asc'})}"
+                    class="sortable"
+                    style="color: white; text-decoration: none"
+                  >
+                    Username
+                    <span
+                      th:if="${sortBy == 'username'}"
+                      th:text="${sortDir == 'asc' ? '▲' : '▼'}"
+                    ></span>
+                  </a>
+                </th>
+                <th>Nama Lengkap</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${userPage.totalElements == 0}">
+                <td
+                  colspan="7"
+                  style="text-align: center; padding: 2rem; color: #64748b"
+                >
+                  Tidak ada data user
+                </td>
+              </tr>
+              <tr th:each="user, iterStat : ${userPage.content}">
+                <td
+                  th:text="${(currentPage * userPage.size) + iterStat.count}"
+                ></td>
+                <td>
+                  <strong th:text="${user.username}"></strong>
+                </td>
+                <td th:text="${user.fullName}"></td>
+                <td th:text="${user.email}"></td>
+                <td>
+                  <span
+                    class="badge"
+                    th:classappend="${user.role == T(id.go.beacukai.nadella.entity.User.Role).Admin ? 'badge-merah' : 'badge-kuning'}"
+                    th:text="${user.role}"
+                  ></span>
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    th:classappend="${user.enabled ? 'badge-hijau' : 'badge-merah'}"
+                    th:text="${user.enabled ? 'Aktif' : 'Nonaktif'}"
+                  ></span>
+                </td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem">
+                    <a
+                      th:href="@{/admin/users/edit/{id}(id=${user.id})}"
+                      class="btn btn-sm btn-success"
+                    >
+                      ✏️ Edit
+                    </a>
+                    <form
+                      th:action="@{/admin/users/delete/{id}(id=${user.id})}"
+                      method="post"
+                      onsubmit="
+                        return confirm(
+                          'Apakah Anda yakin ingin menghapus user ini?',
+                        );
+                      "
+                    >
+                      <button type="submit" class="btn btn-sm btn-danger">
+                        🗑️ Hapus
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${userPage.totalPages > 1}" class="pagination">
+          <a
+            th:href="@{/admin/users(page=0, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
+            class="page-link"
+            th:classappend="${currentPage == 0 ? 'disabled' : ''}"
+          >
+            ⏮️ First
+          </a>
+
+          <a
+            th:href="@{/admin/users(page=${currentPage - 1}, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
+            class="page-link"
+            th:classappend="${currentPage == 0 ? 'disabled' : ''}"
+          >
+            ⬅️ Previous
+          </a>
+
+          <span style="padding: 0.5rem 1rem">
+            Page <strong th:text="${currentPage + 1}"></strong> of
+            <strong th:text="${totalPages}"></strong>
+          </span>
+
+          <a
+            th:href="@{/admin/users(page=${currentPage + 1}, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
+            class="page-link"
+            th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}"
+          >
+            Next ➡️
+          </a>
+
+          <a
+            th:href="@{/admin/users(page=${totalPages - 1}, size=${userPage.size}, sortBy=${sortBy}, sortDir=${sortDir})}"
+            class="page-link"
+            th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}"
+          >
+            Last ⏭️
+          </a>
+        </div>
+
+        <div
+          style="
+            margin-top: 1rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+          "
+        >
+          Menampilkan
+          <strong th:text="${userPage.numberOfElements}"></strong> dari
+          <strong th:text="${totalItems}"></strong> user
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>
