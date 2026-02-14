@@ -78,8 +78,8 @@
                                 Tidak ada data user
                             </td>
                         </tr>
-                        <tr th:each="user : ${userPage.content}">
-                            <td th:text="${user.id}"></td>
+                        <tr th:each="user, iterStat : ${userPage.content}">
+                            <td th:text="${(currentPage * userPage.size) + iterStat.count}"></td>
                             <td>
                                 <strong th:text="${user.username}"></strong>
                             </td>
@@ -87,7 +87,7 @@
                             <td th:text="${user.email}"></td>
                             <td>
                                 <span class="badge" 
-                                      th:classappend="${user.role == T(id.go.beacukai.nadella.entity.User.Role).Admin ? 'badge-merah' : 'badge-kuning'}"
+                                      th:classappend="${user.role == T(id.go.beacukai.nadella.entity.User.Role).ADMIN_NADELLA ? 'badge-merah' : 'badge-kuning'}"
                                       th:text="${user.role}"></span>
                             </td>
                             <td>
