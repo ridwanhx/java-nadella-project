@@ -13,7 +13,7 @@
         <div class="navbar-container">
             <a th:href="@{/dashboard}" class="navbar-brand">
                 <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
-                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+                <span>BEA CUKAI NADELLA</span>
             </a>
             <ul class="navbar-nav">
                 <li>
@@ -22,7 +22,7 @@
                 <li>
                     <a th:href="@{/logistik}" class="nav-link active">Data Logistik</a>
                 </li>
-                <li sec:authorize="hasRole('Admin')">
+                <li sec:authorize="hasRole('ADMIN_NADELLA')">
                     <a th:href="@{/admin/users}" class="nav-link">Kelola User</a>
                 </li>
                 <li>
@@ -69,7 +69,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 50px;">No</th>                            
+                            <th style="width: 50px;">No</th>
                             <th>
                                 <a th:href="@{/logistik(page=${currentPage}, sortBy='kodeLogistik', sortDir=${sortBy == 'kodeLogistik' ? reverseSortDir : 'asc'}, search=${search})}" 
                                    class="sortable" style="color: white; text-decoration: none;">
@@ -88,11 +88,16 @@
                     <tbody>
                         <tr th:if="${logistikPage.totalElements == 0}">
                             <td colspan="9" style="text-align: center; padding: 2rem; color: #64748b;">
-                                Tidak ada data logistik
+                                <span th:if="${search != null && search != ''}">
+                                    Tidak ada data yang cocok dengan pencarian "<strong th:text="${search}"></strong>"
+                                </span>
+                                <span th:if="${search == null || search == ''}">
+                                    Tidak ada data logistik
+                                </span>
                             </td>
                         </tr>
-                        <tr th:each="logistik : ${logistikPage.content}">
-                            <td th:text="${logistik.id}"></td>
+                        <tr th:each="logistik, iterStat : ${logistikPage.content}">
+                            <td th:text="${(currentPage * logistikPage.size) + iterStat.count}"></td>
                             <td>
                                 <strong th:text="${logistik.kodeLogistik}"></strong>
                             </td>
@@ -101,6 +106,7 @@
                                 <span class="badge" 
                                       th:classappend="${logistik.jenisKegiatan == T(id.go.beacukai.nadella.entity.Logistik.JenisKegiatan).IMPOR ? 'badge-impor' : 'badge-ekspor'}"
                                       th:text="${logistik.jenisKegiatan.displayName}"></span>
+                            </td>
                             </td>
                             <td th:text="${logistik.negara}"></td>
                             <td>
