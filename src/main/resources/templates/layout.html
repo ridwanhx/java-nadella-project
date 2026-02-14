@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title + ' - Bea Cukai Nadella' : 'Bea Cukai Nadella'}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" sec:authorize="isAuthenticated()">
+        <div style="display: flex; width: 100%; align-items: center;">
+            <a th:href="@{/dashboard}" class="navbar-brand">
+                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
+                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+            </a>
+            <ul class="navbar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-link" 
+                       th:classappend="${#httpServletRequest.requestURI == '/dashboard' || #httpServletRequest.requestURI == '/' ? 'active' : ''}">
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/logistik}" class="nav-link"
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/logistik') ? 'active' : ''}">
+                        Data Logistik
+                    </a>
+                </li>
+                <li sec:authorize="hasRole('Admin')">
+                    <a th:href="@{/admin/users}" class="nav-link"
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/admin/users') ? 'active' : ''}">
+                        Kelola User
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/chatbot}" class="nav-link"
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/chatbot') ? 'active' : ''}">
+                        Chatbot
+                    </a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; color: white; font-size: inherit;">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+        <div th:if="${message}" class="alert alert-info">
+            <span th:text="${message}"></span>
+        </div>
+
+        <!-- Page Content -->
+        <div layout:fragment="content">
+            <!-- Content will be inserted here -->
+        </div>
+    </div>
+</body>
+</html>

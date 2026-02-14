@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${user.id != null ? 'Edit User' : 'Tambah User'} + ' - Bea Cukai Nadella'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/dashboard}" class="navbar-brand">
+                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
+                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+            </a>
+            <ul class="navbar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+                </li>
+                <li>
+                    <a th:href="@{/logistik}" class="nav-link">Data Logistik</a>
+                </li>
+                <li sec:authorize="hasRole('Admin')">
+                    <a th:href="@{/admin/users}" class="nav-link active">Kelola User</a>
+                </li>
+                <li>
+                    <a th:href="@{/chatbot}" class="nav-link">Chatbot</a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                        <button type="submit" class="btn-logout">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title" th:text="${user.id != null ? 'Edit User' : 'Tambah User Baru'}"></h1>
+            </div>
+
+            <form th:action="${user.id != null ? '/admin/users/edit/' + user.id : '/admin/users/create'}" 
+                  th:object="${user}" 
+                  method="post">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Username *</label>
+                        <input type="text" th:field="*{username}" class="form-control" 
+                               placeholder="Masukkan username"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nama Lengkap *</label>
+                        <input type="text" th:field="*{fullName}" class="form-control" 
+                               placeholder="Masukkan nama lengkap"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" th:field="*{email}" class="form-control" 
+                               placeholder="user@nadella.beacukai.go.id"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        <input type="password" th:field="*{password}" class="form-control" 
+                               placeholder="Masukkan password"
+                               th:required="${user.id == null}">
+                        <small style="color: #64748b;" th:if="${user.id != null}">
+                            Kosongkan jika tidak ingin mengubah password
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Role *</label>
+                        <select th:field="*{role}" class="form-select" required>
+                            <option value="">-- Pilih Role --</option>
+                            <option th:each="role : ${roles}" 
+                                    th:value="${role}" 
+                                    th:text="${role}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select th:field="*{enabled}" class="form-select">
+                            <option th:value="true">Aktif</option>
+                            <option th:value="false">Nonaktif</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        💾 <span th:text="${user.id != null ? 'Update User' : 'Simpan User'}"></span>
+                    </button>
+                    <a th:href="@{/admin/users}" class="btn btn-secondary">
+                        ❌ Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Roles -->
+        <div class="card">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">ℹ️ Informasi Role</h3>
+            <ul style="line-height: 2; color: #64748b;">
+                <li><strong>Admin:</strong> Akses penuh ke semua fitur termasuk CRUD user</li>
+                <li><strong>Petugas:</strong> Dapat mengelola data logistik dan menggunakan chatbot</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

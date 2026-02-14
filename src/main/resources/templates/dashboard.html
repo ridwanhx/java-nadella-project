@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Bea Cukai Nadella</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/dashboard}" class="navbar-brand">
+                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
+                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+            </a>
+            <ul class="navbar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-link active">Dashboard</a>
+                </li>
+                <li>
+                    <a th:href="@{/logistik}" class="nav-link">Data Logistik</a>
+                </li>
+                <li sec:authorize="hasRole('Admin')">
+                    <a th:href="@{/admin/users}" class="nav-link">Kelola User</a>
+                </li>
+                <li>
+                    <a th:href="@{/chatbot}" class="nav-link">Chatbot</a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                        <button type="submit" class="btn-logout">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container" style="flex: 1;">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Dashboard Bea Cukai Nadella</h1>
+                <p style="color: #64748b; margin-top: 0.5rem;">
+                    Selamat datang, <strong th:text="${fullName}"></strong>! 
+                    <span sec:authorize="hasRole('Admin')">(Administrator)</span>
+                    <span sec:authorize="hasRole('Petugas')">(Petugas)</span>
+                </p>
+            </div>
+
+            <!-- Statistics Grid Row 1: Jalur Pemeriksaan -->
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Statistik Jalur Pemeriksaan</h3>
+            <div class="stats-grid">
+                <div class="stat-card hijau">
+                    <div class="stat-label">Jalur Hijau</div>
+                    <div class="stat-value" th:text="${jalurHijau}">0</div>
+                </div>
+
+                <div class="stat-card kuning">
+                    <div class="stat-label">Jalur Kuning</div>
+                    <div class="stat-value" th:text="${jalurKuning}">0</div>
+                </div>
+
+                <div class="stat-card merah">
+                    <div class="stat-label">Jalur Merah</div>
+                    <div class="stat-value" th:text="${jalurMerah}">0</div>
+                </div>
+            </div>
+
+            <!-- Statistics Grid Row 2: Jenis & Total -->
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem; margin-top: 2rem;">Statistik Jenis Kegiatan</h3>
+            <div class="stats-grid-row2">
+                <div class="stat-card impor">
+                    <div class="stat-label">Total Impor</div>
+                    <div class="stat-value" th:text="${totalImpor}">0</div>
+                </div>
+
+                <div class="stat-card ekspor">
+                    <div class="stat-label">Total Ekspor</div>
+                    <div class="stat-value" th:text="${totalEkspor}">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Total Data</div>
+                    <div class="stat-value" th:text="${totalData}">0</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="margin-top: 2rem;">
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Quick Actions</h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a th:href="@{/logistik/create}" class="btn btn-primary">
+                        ➕ Tambah Data Logistik
+                    </a>
+                    <a th:href="@{/logistik}" class="btn btn-success">
+                        📊 Lihat Semua Data
+                    </a>
+                    <a th:href="@{/chatbot}" class="btn btn-secondary">
+                        💬 Chatbot Nadella
+                    </a>
+                    <a sec:authorize="hasRole('Admin')" th:href="@{/admin/users}" class="btn btn-secondary">
+                        👥 Kelola User
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Card -->
+        <div class="card">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Tentang Sistem</h3>
+            <p style="line-height: 1.6; color: #64748b;">
+                Sistem Informasi Logistik Bea Cukai Nadella adalah platform digital nasional yang dirancang 
+                untuk mendukung pengelolaan dan pengawasan logistik impor dan ekspor Indonesia secara modern, 
+                aman, dan terintegrasi. Sistem ini membantu dalam pemantauan barang dan pengelolaan dokumen 
+                kepabeanan.
+            </p>
+        </div>
+    </main>
+    
+    <div class="footer-copyright">
+        © Direktorat Jenderal Bea dan Cukai 2026
+    </div>
+</body>
+</html>

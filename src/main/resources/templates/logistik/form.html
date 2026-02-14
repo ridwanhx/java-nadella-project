@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${logistik.id != null ? 'Edit Data Logistik' : 'Tambah Data Logistik'} + ' - Bea Cukai Nadella'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/dashboard}" class="navbar-brand">
+                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
+                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+            </a>
+            <ul class="navbar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+                </li>
+                <li>
+                    <a th:href="@{/logistik}" class="nav-link active">Data Logistik</a>
+                </li>
+                <li sec:authorize="hasRole('Admin')">
+                    <a th:href="@{/admin/users}" class="nav-link">Kelola User</a>
+                </li>
+                <li>
+                    <a th:href="@{/chatbot}" class="nav-link">Chatbot</a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                        <button type="submit" class="btn-logout">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title" th:text="${logistik.id != null ? 'Edit Data Logistik' : 'Tambah Data Logistik Baru'}"></h1>
+            </div>
+
+            <form th:action="${logistik.id != null ? '/logistik/edit/' + logistik.id : '/logistik/create'}" 
+                  th:object="${logistik}" 
+                  method="post">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Kode Logistik Nadella *</label>
+                        <input type="text" th:field="*{kodeLogistik}" class="form-control" 
+                               placeholder="Contoh: NDL-BC-2045-2025"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('kodeLogistik')}" 
+                             th:errors="*{kodeLogistik}"></div>
+                        <small style="color: #64748b;">Format: NDL-BC-XXXX-YYYY</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nama Barang *</label>
+                        <input type="text" th:field="*{namaBarang}" class="form-control" 
+                               placeholder="Masukkan nama barang"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('namaBarang')}" 
+                             th:errors="*{namaBarang}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Jenis Kegiatan *</label>
+                        <select th:field="*{jenisKegiatan}" class="form-select" required>
+                            <option value="">-- Pilih Jenis --</option>
+                            <option th:each="jenis : ${jenisKegiatanList}" 
+                                    th:value="${jenis}" 
+                                    th:text="${jenis.displayName}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Negara Asal/Tujuan *</label>
+                        <input type="text" th:field="*{negara}" class="form-control" 
+                               placeholder="Contoh: Singapura, China, dll"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Pelabuhan/Bandara *</label>
+                        <select th:field="*{pelabuhanBandara}" class="form-select" required>
+                            <option value="">-- Pilih Pelabuhan/Bandara --</option>
+                            <option th:each="p : ${pelabuhanBandaraList}"
+                                    th:value="${p}"
+                                    th:text="${p.displayName}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Jalur Pemeriksaan *</label>
+                        <select th:field="*{jalurPemeriksaan}" class="form-select" required>
+                            <option value="">-- Pilih Jalur --</option>
+                            <option th:each="jalur : ${jalurPemeriksaanList}" 
+                                    th:value="${jalur}" 
+                                    th:text="${jalur.displayName}"></option>
+                        </select>
+                        <small style="color: #64748b;">
+                            Hijau: Minim pemeriksaan | Kuning: Pemeriksaan dokumen | Merah: Pemeriksaan fisik
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status Kepabeanan *</label>
+                        <select th:field="*{statusKepabeanan}" class="form-select" required>
+                            <option value="">-- Pilih Status --</option>
+                            <option th:each="s : ${statusKepabeananList}"
+                                    th:value="${s}"
+                                    th:text="${s.displayName}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Nomor Dokumen *</label>
+                        <input type="text" th:field="*{nomorDokumen}" class="form-control" 
+                               placeholder="12 digit angka"
+                               maxlength="12"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('nomorDokumen')}" 
+                             th:errors="*{nomorDokumen}"></div>
+                        <small style="color: #64748b;">Harus 12 digit angka</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Petugas *</label>
+                        <input type="email" th:field="*{emailPetugas}" class="form-control" 
+                               placeholder="petugas@nadella.beacukai.go.id"
+                               required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('emailPetugas')}" 
+                             th:errors="*{emailPetugas}"></div>
+                        <small style="color: #64748b;">Harus menggunakan @nadella.beacukai.go.id</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tanggal Pendaftaran *</label>
+                        <input type="date" th:field="*{tanggalPendaftaran}" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        💾 <span th:text="${logistik.id != null ? 'Update Data' : 'Simpan Data'}"></span>
+                    </button>
+                    <a th:href="@{/logistik}" class="btn btn-secondary">
+                        ❌ Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Informasi Validasi -->
+        <div class="card">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">ℹ️ Informasi</h3>
+            <ul style="line-height: 2; color: #64748b;">
+                <li><strong>Jalur Hijau:</strong> Pemeriksaan minimal, barang dapat langsung keluar</li>
+                <li><strong>Jalur Kuning:</strong> Pemeriksaan dokumen lebih detail</li>
+                <li><strong>Jalur Merah:</strong> Pemeriksaan fisik barang dan dokumen</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Logistik - Bea Cukai Nadella</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/dashboard}" class="navbar-brand">
+                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
+                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+            </a>
+            <ul class="navbar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+                </li>
+                <li>
+                    <a th:href="@{/logistik}" class="nav-link active">Data Logistik</a>
+                </li>
+                <li sec:authorize="hasRole('Admin')">
+                    <a th:href="@{/admin/users}" class="nav-link">Kelola User</a>
+                </li>
+                <li>
+                    <a th:href="@{/chatbot}" class="nav-link">Chatbot</a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                        <button type="submit" class="btn-logout">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container" style="flex: 1;">
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Data Logistik Kepabeanan</h1>
+            </div>
+
+            <!-- Actions & Search -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+                <a th:href="@{/logistik/create}" class="btn btn-primary">
+                    ➕ Tambah Data Logistik
+                </a>
+                
+                <form th:action="@{/logistik}" method="get" style="display: flex; gap: 0.5rem;">
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Cari: Kode, Nama Barang, Jenis, Jalur..." 
+                           th:value="${search}"
+                           style="width: 350px;">
+                    <button type="submit" class="btn btn-success">🔍 Cari</button>
+                    <a th:href="@{/logistik}" class="btn btn-secondary">Reset</a>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">No</th>                            
+                            <th>
+                                <a th:href="@{/logistik(page=${currentPage}, sortBy='kodeLogistik', sortDir=${sortBy == 'kodeLogistik' ? reverseSortDir : 'asc'}, search=${search})}" 
+                                   class="sortable" style="color: white; text-decoration: none;">
+                                    Kode Logistik <span th:if="${sortBy == 'kodeLogistik'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
+                                </a>
+                            </th>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/logistik(page=${currentPage}, sortBy='kodeLogistik', sortDir=${sortBy == 'kodeLogistik' ? reverseSortDir : 'asc'}, search=${search})}" 
+                                   class="sortable" style="color: white; text-decoration: none;">
+                                    Kode Logistik <span th:if="${sortBy == 'kodeLogistik'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
+                                </a>
+                            </th>
+                            <th>Nama Barang</th>
+                            <th>Jenis</th>
+                            <th>Negara</th>
+                            <th>Jalur</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${logistikPage.totalElements == 0}">
+                            <td colspan="9" style="text-align: center; padding: 2rem; color: #64748b;">
+                                Tidak ada data logistik
+                            </td>
+                        </tr>
+                        <tr th:each="logistik : ${logistikPage.content}">
+                            <td th:text="${logistik.id}"></td>
+                            <td>
+                                <strong th:text="${logistik.kodeLogistik}"></strong>
+                            </td>
+                            <td th:text="${logistik.namaBarang}"></td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${logistik.jenisKegiatan == T(id.go.beacukai.nadella.entity.Logistik.JenisKegiatan).IMPOR ? 'badge-impor' : 'badge-ekspor'}"
+                                      th:text="${logistik.jenisKegiatan.displayName}"></span>
+                            </td>
+                            <td th:text="${logistik.negara}"></td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${logistik.jalurPemeriksaan == T(id.go.beacukai.nadella.entity.Logistik.JalurPemeriksaan).HIJAU ? 'badge-hijau' : 
+                                                      (logistik.jalurPemeriksaan == T(id.go.beacukai.nadella.entity.Logistik.JalurPemeriksaan).KUNING ? 'badge-kuning' : 'badge-merah')}"
+                                      th:text="${logistik.jalurPemeriksaan.displayName}"></span>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                    th:text="${logistik.statusKepabeanan.displayName}">
+                                </span>
+                            </td>
+                            <td th:text="${#temporals.format(logistik.tanggalPendaftaran, 'dd-MM-yyyy')}"></td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <a th:href="@{/logistik/edit/{id}(id=${logistik.id})}" class="btn btn-sm btn-success">
+                                        ✏️ Edit
+                                    </a>
+                                    <!-- Delete button only for ADMIN -->
+                                    <form sec:authorize="hasRole('Admin')" 
+                                          th:action="@{/logistik/delete/{id}(id=${logistik.id})}" 
+                                          method="post" 
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            🗑️ Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div th:if="${logistikPage.totalPages > 1}" class="pagination">
+                <a th:href="@{/logistik(page=0, size=${logistikPage.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}"
+                   class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                    ⏮️ First
+                </a>
+                
+                <a th:href="@{/logistik(page=${currentPage - 1}, size=${logistikPage.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}"
+                   class="page-link" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                    ⬅️ Previous
+                </a>
+                
+                <span style="padding: 0.5rem 1rem;">
+                    Page <strong th:text="${currentPage + 1}"></strong> of <strong th:text="${totalPages}"></strong>
+                </span>
+                
+                <a th:href="@{/logistik(page=${currentPage + 1}, size=${logistikPage.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}"
+                   class="page-link" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
+                    Next ➡️
+                </a>
+                
+                <a th:href="@{/logistik(page=${totalPages - 1}, size=${logistikPage.size}, sortBy=${sortBy}, sortDir=${sortDir}, search=${search})}"
+                   class="page-link" th:classappend="${currentPage + 1 >= totalPages ? 'disabled' : ''}">
+                    Last ⏭️
+                </a>
+            </div>
+
+            <div style="margin-top: 1rem; text-align: center; color: #64748b; font-size: 0.875rem;">
+                Menampilkan <strong th:text="${logistikPage.numberOfElements}"></strong> dari 
+                <strong th:text="${totalItems}"></strong> data
+            </div>
+        </div>
+    </main>
+    
+    <div class="footer-copyright">
+        © Direktorat Jenderal Bea dan Cukai 2026
+    </div>
+</body>
+</html>

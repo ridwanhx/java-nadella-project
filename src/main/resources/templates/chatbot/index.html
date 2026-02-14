@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Nadella - Bea Cukai Nadella</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/dashboard}" class="navbar-brand">
+                <img th:src="@{/images/logo-beacukai.png}" alt="Logo">
+                <span>SISTEM LOGISTIK BEA CUKAI NADELLA</span>
+            </a>
+            <ul class="navbar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-link">Dashboard</a>
+                </li>
+                <li>
+                    <a th:href="@{/logistik}" class="nav-link">Data Logistik</a>
+                </li>
+                <li sec:authorize="hasRole('Admin')">
+                    <a th:href="@{/admin/users}" class="nav-link">Kelola User</a>
+                </li>
+                <li>
+                    <a th:href="@{/chatbot}" class="nav-link active">Chatbot</a>
+                </li>
+                <li>
+                    <form th:action="@{/logout}" method="post" style="display: inline; margin: 0;">
+                        <button type="submit" class="btn-logout">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">💬 Chatbot Kepabeanan Nadella</h1>
+            </div>
+
+            <div class="chatbot-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-content">
+                            <strong>Chatbot</strong>
+                            <p>Selamat datang di Chatbot Bea Cukai Nadella! Saya siap membantu Anda dengan informasi seputar:</p>
+                            <ul>
+                                <li>Jalur pemeriksaan</li>
+                                <li>Proses impor dan ekspor</li>
+                                <li>Dokumen kepabeanan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <input type="text" id="userInput" class="form-control chat-input" 
+                           placeholder="Ketik pertanyaan Anda di sini..." 
+                           onkeypress="handleKeyPress(event)">
+                    <button onclick="sendMessage()" class="btn btn-primary" id="sendBtn">
+                        📤 Kirim
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example Questions -->
+        <div class="card">
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">💡 Frequently Asked Question</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <button onclick="askQuestion('Apa itu jalur hijau?')" class="btn btn-secondary" style="text-align: left;">
+                    Apa itu jalur hijau?
+                </button>
+                <button onclick="askQuestion('Bagaimana proses impor barang?')" class="btn btn-secondary" style="text-align: left;">
+                    Bagaimana proses impor barang?
+                </button>
+                <button onclick="askQuestion('Dokumen apa yang diperlukan untuk ekspor?')" class="btn btn-secondary" style="text-align: left;">
+                    Dokumen apa yang diperlukan untuk ekspor?
+                </button>
+                <button onclick="askQuestion('Perbedaan jalur kuning dan merah?')" class="btn btn-secondary" style="text-align: left;">
+                    Perbedaan jalur kuning dan merah?
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function askQuestion(question) {
+            document.getElementById('userInput').value = question;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                return;
+            }
+
+            // Disable input and button
+            input.disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('sendBtn').textContent = '⏳ Mengirim...';
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+
+            try {
+                const response = await fetch('/chatbot/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                
+                // Add bot response to chat
+                addMessage(data.response, 'bot');
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Maaf, terjadi kesalahan. Silakan coba lagi.', 'bot');
+            } finally {
+                // Re-enable input and button
+                input.disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('sendBtn').textContent = '📤 Kirim';
+                input.focus();
+            }
+        }
+
+        function addMessage(text, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + sender;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (sender === 'bot') {
+                contentDiv.innerHTML = '<strong>Chatbot</strong><p>' + text.replace(/\n/g, '<br>') + '</p>';
+            } else {
+                contentDiv.innerHTML = '<p>' + text + '</p>';
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Focus on input when page loads
+        window.onload = function() {
+            document.getElementById('userInput').focus();
+        };
+    </script>
+</body>
+</html>
