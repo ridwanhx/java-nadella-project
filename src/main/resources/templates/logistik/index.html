@@ -76,14 +76,6 @@
                                     Kode Logistik <span th:if="${sortBy == 'kodeLogistik'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
                                 </a>
                             </th>
-                                </a>
-                            </th>
-                            <th>
-                                <a th:href="@{/logistik(page=${currentPage}, sortBy='kodeLogistik', sortDir=${sortBy == 'kodeLogistik' ? reverseSortDir : 'asc'}, search=${search})}" 
-                                   class="sortable" style="color: white; text-decoration: none;">
-                                    Kode Logistik <span th:if="${sortBy == 'kodeLogistik'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
-                                </a>
-                            </th>
                             <th>Nama Barang</th>
                             <th>Jenis</th>
                             <th>Negara</th>

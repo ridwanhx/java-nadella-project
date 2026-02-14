@@ -65,12 +65,6 @@
                                     Username <span th:if="${sortBy == 'username'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
                                 </a>
                             </th>
-                            <th>
-                                <a th:href="@{/admin/users(page=${currentPage}, sortBy='username', sortDir=${sortBy == 'username' ? reverseSortDir : 'asc'})}" 
-                                   class="sortable" style="color: white; text-decoration: none;">
-                                    Username <span th:if="${sortBy == 'username'}" th:text="${sortDir == 'asc' ? '▲' : '▼'}"></span>
-                                </a>
-                            </th>
                             <th>Nama Lengkap</th>
                             <th>Email</th>
                             <th>Role</th>
